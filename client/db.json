@@ -1,0 +1,42 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "email": "demo@example.com",
+      "name": "John Doe",
+      "password": "password123",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "subscription": {
+        "plan": "free",
+        "status": "active",
+        "expiresAt": "2024-12-31T23:59:59.999Z"
+      }
+    }
+  ],
+  "conversations": [
+    {
+      "id": "1",
+      "userId": "1",
+      "title": "Welcome to Saast",
+      "messages": [
+        {
+          "id": "1",
+          "conversationId": "1",
+          "role": "assistant",
+          "content": "# Welcome to Saast! 🎉\n\nI'm your AI assistant, and I'm here to help you explore the capabilities of this chat platform. Here's what I can do:\n\n## Features I Support:\n\n### 📝 **Markdown Rendering**\n- **Bold** and *italic* text\n- Lists, links, and headers\n- Tables and blockquotes\n\n### 📊 **Mermaid Diagrams**\nI can create flowcharts, sequence diagrams, and more:\n\n```mermaid\ngraph TD\n    A[User Input] --> B[AI Processing]\n    B --> C[Response Generation]\n    C --> D[Markdown Rendering]\n    D --> E[Display to User]\n```\n\n### 💻 **Code Highlighting**\nI support syntax highlighting for many languages:\n\n```javascript\nconst greet = (name) => {\n  console.log(`Hello, ${name}!`);\n};\n\ngreet('World');\n```\n\n```python\ndef fibonacci(n):\n    if n <= 1:\n        return n\n    return fibonacci(n-1) + fibonacci(n-2)\n\nprint(fibonacci(10))\n```\n\n### 🎨 **Rich Content**\n> This is a beautiful blockquote that demonstrates how I can format content nicely.\n\n| Feature | Status |\n|---------|--------|\n| Markdown | ✅ |\n| Mermaid | ✅ |\n| Code | ✅ |\n| Math | 🔄 Coming Soon |\n\n---\n\n**Try asking me about:**\n- Creating diagrams with Mermaid\n- Code examples in any language\n- Explanations with rich formatting\n- Data analysis and visualization concepts\n\nWhat would you like to explore first? 🚀",
+          "timestamp": "2024-01-01T00:00:00.000Z",
+          "metadata": {
+            "model": "gpt-3.5-turbo",
+            "tokens": 350
+          }
+        }
+      ],
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "model": "gpt-3.5-turbo"
+    }
+  ],
+  "auth": {
+    "tokens": []
+  }
+}
