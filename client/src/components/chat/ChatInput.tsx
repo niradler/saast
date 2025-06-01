@@ -15,12 +15,12 @@ interface ChatInputProps {
   onToggleFullscreen?: () => void;
 }
 
-export function ChatInput({ 
-  onSendMessage, 
-  disabled = false, 
-  placeholder = "Type your message...",
+export function ChatInput({
+  onSendMessage,
+  disabled = false,
+  placeholder = 'Type your message...',
   isFullscreen = false,
-  onToggleFullscreen
+  onToggleFullscreen,
 }: ChatInputProps) {
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -28,13 +28,13 @@ export function ChatInput({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  const { 
-    activeConversationId, 
-    addMessage, 
-    createNewConversation, 
+
+  const {
+    activeConversationId,
+    addMessage,
+    createNewConversation,
     setActiveConversation,
-    getActiveConversation
+    getActiveConversation,
   } = useChatStore();
   const { user } = useAuthStore();
 
@@ -61,28 +61,28 @@ export function ChatInput({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!message.trim() || disabled || isLoading) return;
-    
+
     const messageText = message.trim();
     setMessage('');
-    
+
     // Check for demo command
-    if (messageText.toLowerCase() === 'demo:chat') {
-      handleDemoChat();
+    if (messageText.startsWith('/demo')) {
+      handleDemoChat(messageText);
       return;
     }
-    
+
     try {
       setIsLoading(true);
-      
+
       // Create conversation if none exists
       let conversationId = activeConversationId;
       if (!conversationId && user) {
         conversationId = createNewConversation();
         setActiveConversation(conversationId);
       }
-      
+
       if (!conversationId || !user) {
         toast.error('Please login to send messages');
         return;
@@ -110,7 +110,6 @@ export function ChatInput({
 
       // Call custom handler if provided
       onSendMessage?.(messageText);
-      
     } catch (error: any) {
       toast.error(error.message || 'Failed to send message');
       // Restore message on error
@@ -120,10 +119,16 @@ export function ChatInput({
     }
   };
 
-  const handleDemoChat = () => {
+  const handleDemoChat = (messageText: string) => {
+    const type = messageText.split(' ')[1];
     if (!activeConversationId || !user) return;
-
-    const demoResponse = `# 🎉 Saast Chat Capabilities Demo
+    let demoResponse = '';
+    switch (type) {
+      // case 'chat':
+      //   break;
+      case 'markdown':
+        demoResponse = `
+# 🎉 Saast Chat Capabilities Demo
 
 Welcome to the comprehensive demo of Saast's advanced chat rendering capabilities!
 
@@ -147,38 +152,29 @@ Welcome to the comprehensive demo of Saast's advanced chat rendering capabilitie
 > 
 > This is a multi-line blockquote that demonstrates how we handle longer quoted content with proper styling and formatting.
 
-## 📊 **Mermaid Diagrams**
+## 📋 **Tables and Data**
 
-### Flowchart Example
-\`\`\`mermaid
-graph TD
-    A[User Input] --> B{Input Type?}
-    B -->|Text| C[Process Text]
-    B -->|Code| D[Syntax Highlight]
-    B -->|Diagram| E[Render Mermaid]
-    C --> F[Generate Response]
-    D --> F
-    E --> F
-    F --> G[Display Result]
-    G --> H[User Sees Output]
-\`\`\`
+| Feature | Status | Performance | Mobile Support |
+|---------|--------|-------------|----------------|
+| Markdown | ✅ Complete | ⚡ Excellent | 📱 Optimized |
+| Mermaid | ✅ Complete | ⚡ Fast | 📱 Responsive |
+| Code Syntax | ✅ 100+ Languages | ⚡ Instant | 📱 Scrollable |
+| Math (LaTeX) | 🔄 Coming Soon | - | - |
+| Custom HTML | ✅ Sanitized | ⚡ Secure | 📱 Adaptive |
 
-### Sequence Diagram
-\`\`\`mermaid
-sequenceDiagram
-    participant U as User
-    participant S as Saast
-    participant AI as AI Engine
-    participant R as Renderer
-    
-    U->>S: Send Message
-    S->>AI: Process Request
-    AI->>S: Generate Response
-    S->>R: Parse Content
-    R->>S: Formatted Output
-    S->>U: Display Result
-\`\`\`
-
+### Task Lists
+- [x] Implement markdown rendering
+- [x] Add mermaid diagram support  
+- [x] Create syntax highlighting
+- [ ] Add LaTeX math support
+- [ ] Implement voice input
+- [ ] Add file attachments
+        `;
+        break;
+      // case 'form':
+      //   break;
+      case 'code':
+        demoResponse = `
 ## 💻 **Code Highlighting**
 
 ### JavaScript/TypeScript
@@ -254,65 +250,68 @@ HAVING conversation_count > 0
 ORDER BY last_activity DESC
 LIMIT 50;
 \`\`\`
+     
+        `;
+        break;
+      // case 'table':
+      //   break;
+      case 'diagram':
+        demoResponse = `
+## 📊 **Mermaid Diagrams**
 
-## 📋 **Tables and Data**
+### Flowchart Example
+\`\`\`mermaid
+graph TD
+    A[User Input] --> B{Input Type?}
+    B -->|Text| C[Process Text]
+    B -->|Code| D[Syntax Highlight]
+    B -->|Diagram| E[Render Mermaid]
+    C --> F[Generate Response]
+    D --> F
+    E --> F
+    F --> G[Display Result]
+    G --> H[User Sees Output]
+\`\`\`
 
-| Feature | Status | Performance | Mobile Support |
-|---------|--------|-------------|----------------|
-| Markdown | ✅ Complete | ⚡ Excellent | 📱 Optimized |
-| Mermaid | ✅ Complete | ⚡ Fast | 📱 Responsive |
-| Code Syntax | ✅ 100+ Languages | ⚡ Instant | 📱 Scrollable |
-| Math (LaTeX) | 🔄 Coming Soon | - | - |
-| Custom HTML | ✅ Sanitized | ⚡ Secure | 📱 Adaptive |
-
-## 🎨 **Advanced Formatting**
-
-### Mathematical Expressions (Text Format)
-- **Quadratic Formula**: x = (-b ± √(b²-4ac)) / 2a  
-- **Pythagorean Theorem**: a² + b² = c²
-- **Euler's Identity**: e^(iπ) + 1 = 0
-
-### Task Lists
-- [x] Implement markdown rendering
-- [x] Add mermaid diagram support  
-- [x] Create syntax highlighting
-- [ ] Add LaTeX math support
-- [ ] Implement voice input
-- [ ] Add file attachments
-
-### Horizontal Rules
----
-
-## 🌈 **Theme Support**
-
-This content adapts to your selected theme:
-- **Light Mode**: Clean, professional appearance
-- **Dark Mode**: Eye-friendly for low light
-- **Ocean Blue**: Cool, calming interface  
-- **Purple Rain**: Vibrant, creative atmosphere
-
----
-
-## 🚀 **What Makes This Special?**
-
-1. **Real-time Rendering**: Content appears instantly as you type
-2. **Mobile Optimized**: Perfect on phones, tablets, and desktops
-3. **Accessibility**: Screen reader friendly with proper ARIA labels
-4. **Performance**: Optimized for speed with code splitting
-5. **Extensible**: Easy to add new content types and renderers
-
-### Try These Commands:
-- Ask for code examples in any language
-- Request diagrams: "Create a flowchart for user authentication"
-- Request formatted data: "Show me a comparison table"
-- Ask for explanations with rich formatting
-
-**What would you like to explore next?** 🎯`;
+### Sequence Diagram
+\`\`\`mermaid
+sequenceDiagram
+    participant U as User
+    participant S as Saast
+    participant AI as AI Engine
+    participant R as Renderer
+    
+    U->>S: Send Message
+    S->>AI: Process Request
+    AI->>S: Generate Response
+    S->>R: Parse Content
+    R->>S: Formatted Output
+    S->>U: Display Result
+\`\`\`        
+        `;
+        break;
+      case 'html':
+        demoResponse = `
+  <h1 class="text-2xl font-bold">Welcome to our website</h1>
+  <p class="text-gray-600">This is a simple HTML example with inline styles.</p>
+  <input type="text" class="border border-gray-300 rounded-md p-2" placeholder="Enter your name" />
+  <button class="bg-blue-500 text-white rounded-md p-2">Submit</button>
+        `;
+        break;
+      default:
+        demoResponse = `
+### Demos available
+- /demo markdown
+- /demo code
+- /demo diagram
+- /demo html
+`;
+    }
 
     // Add user message
     addMessage(activeConversationId, {
       role: 'user',
-      content: 'demo:chat',
+      content: messageText,
       conversationId: activeConversationId,
     });
 
@@ -388,18 +387,16 @@ This content adapts to your selected theme:
   const canSend = message.trim() && !disabled && !isLoading;
 
   return (
-    <div className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+    <div className="border-t border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
       {/* Loading indicator */}
       {isLoading && (
-        <div className="flex items-center justify-center py-3 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex items-center justify-center border-b border-gray-200 py-3 dark:border-gray-800">
           <div className="typing-indicator">
             <div className="typing-dot"></div>
             <div className="typing-dot"></div>
             <div className="typing-dot"></div>
           </div>
-          <span className="ml-3 text-sm text-gray-500 dark:text-gray-400">
-            AI is thinking...
-          </span>
+          <span className="ml-3 text-sm text-gray-500 dark:text-gray-400">AI is thinking...</span>
         </div>
       )}
 
@@ -413,11 +410,11 @@ This content adapts to your selected theme:
               variant="outline"
               size="sm"
               onClick={handleNewChat}
-              className="hidden sm:flex flex-shrink-0 h-10"
+              className="hidden h-10 flex-shrink-0 sm:flex"
               disabled={disabled}
               aria-label="Start new conversation"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="h-4 w-4" />
             </Button>
 
             {/* Fullscreen Toggle - Only on mobile */}
@@ -427,16 +424,16 @@ This content adapts to your selected theme:
                 variant="outline"
                 size="sm"
                 onClick={onToggleFullscreen}
-                className="sm:hidden flex-shrink-0 h-10"
-                aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+                className="h-10 flex-shrink-0 sm:hidden"
+                aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
               >
-                {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+                {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
               </Button>
             )}
 
             {/* Message Input Container */}
-            <div className="flex-1 relative">
-              <div className="flex items-end space-x-2 p-3 border border-gray-300 dark:border-gray-600 rounded-2xl bg-gray-50 dark:bg-gray-800 focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500 transition-colors">
+            <div className="relative flex-1">
+              <div className="flex items-end space-x-2 rounded-2xl border border-gray-300 bg-gray-50 p-3 transition-colors focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500 dark:border-gray-600 dark:bg-gray-800">
                 {/* Attachment Button - Only show if feature is enabled */}
                 {config.features.fileUpload && (
                   <Button
@@ -444,11 +441,11 @@ This content adapts to your selected theme:
                     variant="ghost"
                     size="sm"
                     onClick={handleFileUpload}
-                    className="flex-shrink-0 w-8 h-8 p-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    className="h-8 w-8 flex-shrink-0 p-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                     disabled={disabled}
                     aria-label="Attach file"
                   >
-                    <Paperclip className="w-4 h-4" />
+                    <Paperclip className="h-4 w-4" />
                   </Button>
                 )}
 
@@ -456,11 +453,11 @@ This content adapts to your selected theme:
                 <textarea
                   ref={textareaRef}
                   value={message}
-                  onChange={(e) => setMessage(e.target.value)}
+                  onChange={e => setMessage(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder={placeholder}
                   disabled={disabled || isLoading}
-                  className="flex-1 resize-none bg-transparent border-none outline-none text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 min-h-[24px] max-h-[120px]"
+                  className="max-h-[120px] min-h-[24px] flex-1 resize-none border-none bg-transparent text-gray-900 placeholder-gray-500 outline-none dark:text-gray-100 dark:placeholder-gray-400"
                   rows={1}
                   style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 />
@@ -472,15 +469,15 @@ This content adapts to your selected theme:
                     variant="ghost"
                     size="sm"
                     onClick={toggleRecording}
-                    className={`flex-shrink-0 w-8 h-8 p-0 transition-colors ${
-                      isRecording 
-                        ? 'text-red-500 hover:text-red-600' 
+                    className={`h-8 w-8 flex-shrink-0 p-0 transition-colors ${
+                      isRecording
+                        ? 'text-red-500 hover:text-red-600'
                         : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
                     }`}
                     disabled={disabled}
                     aria-label={isRecording ? 'Stop recording' : 'Start voice recording'}
                   >
-                    {isRecording ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                    {isRecording ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                   </Button>
                 )}
 
@@ -489,17 +486,17 @@ This content adapts to your selected theme:
                   type="submit"
                   size="sm"
                   disabled={!canSend}
-                  className={`flex-shrink-0 w-8 h-8 p-0 transition-all ${
-                    canSend 
-                      ? 'bg-primary-600 hover:bg-primary-700 text-white scale-100' 
-                      : 'bg-gray-300 dark:bg-gray-600 text-gray-500 scale-95'
+                  className={`h-8 w-8 flex-shrink-0 p-0 transition-all ${
+                    canSend
+                      ? 'scale-100 bg-primary-600 text-white hover:bg-primary-700'
+                      : 'scale-95 bg-gray-300 text-gray-500 dark:bg-gray-600'
                   }`}
                   aria-label="Send message"
                 >
-                  <Send className="w-4 h-4" />
+                  <Send className="h-4 w-4" />
                 </Button>
               </div>
-              
+
               {/* Character count for long messages */}
               {message.length > 500 && (
                 <div className="absolute -top-6 right-0 text-xs text-gray-400">
@@ -510,19 +507,17 @@ This content adapts to your selected theme:
           </div>
 
           {/* Helper text */}
-          <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
+          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
             <div className="flex items-center space-x-4">
               <span>Press Enter to send, Shift+Enter for new line</span>
               {!isFullscreen && (
-                <span className="hidden sm:inline text-primary-600 dark:text-primary-400">
-                  Try: "demo:chat" for capabilities showcase
+                <span className="hidden text-primary-600 dark:text-primary-400 sm:inline">
+                  Try: "/demo" for capabilities showcase
                 </span>
               )}
             </div>
             {user && (
-              <span className="hidden sm:inline">
-                {user.subscription?.plan || 'Free'} plan
-              </span>
+              <span className="hidden sm:inline">{user.subscription?.plan || 'Free'} plan</span>
             )}
           </div>
         </form>
