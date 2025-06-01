@@ -5,3 +5,5 @@ export { Message } from './Message';
 export { ContentRenderer } from './ContentRenderer';
 export { CodeRenderer } from './CodeRenderer';
 export { MermaidRenderer } from './MermaidRenderer';
+export { MessageActions } from './MessageActions';
+export { ModelSelector } from './ModelSelector';
